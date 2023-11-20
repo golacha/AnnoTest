@@ -46,6 +46,8 @@ public class MagicMojaProcessor  extends AbstractProcessor {    // Processor인�
                         , "Processing " + elementName);
             }
 
+            TypeElement typeElement = (TypeElement) element;
+            ClassName className = ClassName.get(typeElement);
 
             MethodSpec pullOutMethod = MethodSpec.methodBuilder("pullOut")
                     .addModifiers(Modifier.PUBLIC)
@@ -55,13 +57,12 @@ public class MagicMojaProcessor  extends AbstractProcessor {    // Processor인�
 
             TypeSpec magicMoja = TypeSpec.classBuilder("MagicMoja")
                     .addModifiers(Modifier.PUBLIC)
+                    .addSuperinterface(className)   // @Magic이 붙어있는 element의 클래스 이름을 구현
                     .addMethod(pullOutMethod)
                     .build();
 
             // 소스 파일을 만드는 과정
             Filer filer = processingEnv.getFiler();
-            TypeElement typeElement = (TypeElement) element;
-            ClassName className = ClassName.get(typeElement);
             try {
                 JavaFile.builder(className.packageName(), magicMoja)
                         .build()
